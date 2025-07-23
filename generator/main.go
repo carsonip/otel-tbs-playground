@@ -36,6 +36,7 @@ func runTransactions(tracerProvider *trace.TracerProvider) {
 	tracer := tracerProvider.Tracer("otel-tbs-playground")
 	ctx := context.Background()
 	var wg sync.WaitGroup
+	var doneCh = make(chan struct{})
 
 	// Slow threads: each sends a slow transaction with configurable duration
 	for i := 0; i < *numSlow; i++ {
@@ -46,6 +47,7 @@ func runTransactions(tracerProvider *trace.TracerProvider) {
 			time.Sleep(*slowDuration)
 			span.End()
 			fmt.Printf("Slow transaction %d finished\n", id)
+			close(doneCh)
 		}(i)
 	}
 
@@ -55,10 +57,15 @@ func runTransactions(tracerProvider *trace.TracerProvider) {
 		go func(id int) {
 			defer wg.Done()
 			for {
+				select {
+				case <-doneCh:
+					return
+				default:
+				}
 				_, span := tracer.Start(ctx, fmt.Sprintf("fast-transaction-%d", id))
 				span.End()
 				// Optionally, sleep for a tiny amount to avoid overwhelming the exporter
-				// time.Sleep(1 * time.Millisecond)
+				time.Sleep(10 * time.Millisecond)
 			}
 		}(i)
 	}
