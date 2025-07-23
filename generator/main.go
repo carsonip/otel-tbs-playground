@@ -4,9 +4,9 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"math/rand"
 	"os"
 	"sync"
-	"sync/atomic"
 	"time"
 
 	"go.opentelemetry.io/otel/attribute"
@@ -22,6 +22,7 @@ var (
 	numFast      = flag.Int("fast", 4, "number of fast threads")
 	numSlow      = flag.Int("slow", 1, "number of slow threads")
 	slowDuration = flag.Duration("slow-duration", 10*time.Second, "duration of each slow transaction")
+	payloadSize  = flag.Int("payload-size", 0, "size of random payload attribute for each span")
 )
 
 func setup() *trace.TracerProvider {
@@ -34,22 +35,30 @@ func setup() *trace.TracerProvider {
 	return tracerProvider
 }
 
+func randomString(n int) string {
+	letters := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letters[rand.Intn(len(letters))]
+	}
+	return string(b)
+}
+
 func runTransactions(tracerProvider *trace.TracerProvider) {
 	tracer := tracerProvider.Tracer("otel-tbs-playground")
 	ctx := context.Background()
 	var wg sync.WaitGroup
 	var doneCh = make(chan struct{})
 
-	slowTxnID := atomic.Int64{}
 	// Slow threads: each sends a slow transaction with configurable duration
 	for i := 0; i < *numSlow; i++ {
 		wg.Add(1)
 		go func(id int) {
 			defer wg.Done()
-			_, span := tracer.Start(ctx, fmt.Sprintf("slow-transaction-%d", slowTxnID.Add(1)))
-			span.SetAttributes(
-				attribute.String("thread_id", fmt.Sprintf("slow-%d", id)),
-			)
+			_, span := tracer.Start(ctx, fmt.Sprintf("slow-transaction-%d", id))
+			if *payloadSize > 0 {
+				span.SetAttributes(attribute.String("payload", randomString(*payloadSize)))
+			}
 			time.Sleep(*slowDuration)
 			span.End()
 			fmt.Printf("Slow transaction %d finished\n", id)
@@ -57,7 +66,6 @@ func runTransactions(tracerProvider *trace.TracerProvider) {
 		}(i)
 	}
 
-	fastTxnID := atomic.Int64{}
 	// Fast threads: send fast transactions as quickly as possible
 	for i := 0; i < *numFast; i++ {
 		wg.Add(1)
@@ -69,10 +77,10 @@ func runTransactions(tracerProvider *trace.TracerProvider) {
 					return
 				default:
 				}
-				_, span := tracer.Start(ctx, fmt.Sprintf("fast-transaction-%d", fastTxnID.Add(1)))
-				span.SetAttributes(
-					attribute.String("thread_id", fmt.Sprintf("fast-%d", id)),
-				)
+				_, span := tracer.Start(ctx, fmt.Sprintf("fast-transaction-%d", id))
+				if *payloadSize > 0 {
+					span.SetAttributes(attribute.String("payload", randomString(*payloadSize)))
+				}
 				span.End()
 				// Optionally, sleep for a tiny amount to avoid overwhelming the exporter
 				time.Sleep(10 * time.Millisecond)
