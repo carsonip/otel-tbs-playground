@@ -1,0 +1,23 @@
+dist:
+  module: github.com/carsonip/otel-tbs-playground
+  name: otel-tbs-playground
+  description: tail sampling playground distribution
+  version: 0.0.1
+  output_path: ./_build
+
+receivers:
+  - gomod: go.opentelemetry.io/collector/receiver/otlpreceiver v0.130.0
+
+processors:
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/tailsamplingprocessor v0.130.0
+
+exporters:
+  - gomod: github.com/carsonip/otel-tbs-playground/exporter/countexporter v0.0.0
+    path: ./exporter/countexporter
+
+providers:
+  - gomod: go.opentelemetry.io/collector/confmap/provider/envprovider v1.36.0
+  - gomod: go.opentelemetry.io/collector/confmap/provider/fileprovider v1.36.0
+  - gomod: go.opentelemetry.io/collector/confmap/provider/httpprovider v1.36.0
+  - gomod: go.opentelemetry.io/collector/confmap/provider/httpsprovider v1.36.0
+  - gomod: go.opentelemetry.io/collector/confmap/provider/yamlprovider v1.36.0

@@ -13,10 +13,7 @@ processors:
         type: always_sample
 
 exporters:
-  otlp:
-    endpoint: "localhost:44317"
-    tls:
-      insecure: true
+  count:
 
 
 service:
@@ -24,7 +21,7 @@ service:
     traces:
       receivers: [otlp]
       processors: [tail_sampling]
-      exporters: [otlp]
+      exporters: [count]
   telemetry:
     metrics:
       readers:
