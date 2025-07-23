@@ -5,9 +5,7 @@ receivers:
         endpoint: "localhost:44317"
 
 processors:
-  batch:
-    send_batch_size: 100000000
-    timeout: 100s
+  deltatocumulative:
 
 connectors:
   signaltometrics:
@@ -25,10 +23,10 @@ service:
   pipelines:
     traces:
       receivers: [otlp]
-      processors: [batch]
       exporters: [signaltometrics]
     metrics:
       receivers: [signaltometrics]
+      processors: [deltatocumulative]
       exporters: [debug]
   telemetry:
     metrics:
