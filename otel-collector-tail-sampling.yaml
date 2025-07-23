@@ -1,0 +1,32 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+
+processors:
+  tail_sampling:
+    num_traces: 5
+    decision_wait: 1s
+    policies:
+      - name: always_sample
+        type: always_sample
+
+connectors:
+  spanmetrics:
+    metrics_flush_interval: 5s
+    histogram:
+      disable: true
+
+exporters:
+  debug:
+    verbosity: normal
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [tail_sampling]
+      exporters: [spanmetrics]
+    metrics:
+      receivers: [spanmetrics]
+      exporters: [debug]
