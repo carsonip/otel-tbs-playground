@@ -1,0 +1,7 @@
+type: count
+
+status:
+  class: exporter
+  stability:
+    alpha: [traces]
+  distributions: []
