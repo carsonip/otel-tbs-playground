@@ -1,13 +1,7 @@
 #!/bin/bash
 
-
-# Start the sink collector
-/home/carson/projects/opentelemetry-collector-contrib/bin/otelcontribcol_linux_amd64 --config sink.yaml &
-SINK_PID=$!
-
-sleep 2
 # Start the tail collector
-/home/carson/projects/opentelemetry-collector-contrib/bin/otelcontribcol_linux_amd64 --config tail.yaml &
+./_build/otel-tbs-playground --config tail.yaml &
 TAIL_PID=$!
 
 # Give both collectors a moment to start
@@ -31,7 +25,5 @@ exec 3< <(
 
 sleep 10
 kill $TAIL_PID
-sleep 4
-kill $SINK_PID
 read -u 3 MAX_RSS
 echo "tail collector RSS high watermark: ${MAX_RSS} KB"
