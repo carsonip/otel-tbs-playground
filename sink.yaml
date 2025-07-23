@@ -4,24 +4,31 @@ receivers:
       grpc:
         endpoint: "localhost:44317"
 
+processors:
+  batch:
+    send_batch_size: 100000000
+    timeout: 100s
+
 connectors:
-  spanmetrics:
-    metrics_flush_interval: 5s
-    histogram:
-      disable: true
+  signaltometrics:
+    spans:
+      - name: span.count
+        description: Count of spans
+        sum:
+          value: "1"
 
 exporters:
   debug:
-    verbosity: normal
+    verbosity: detailed
 
 service:
   pipelines:
     traces:
       receivers: [otlp]
-      processors: []
-      exporters: [spanmetrics]
+      processors: [batch]
+      exporters: [signaltometrics]
     metrics:
-      receivers: [spanmetrics]
+      receivers: [signaltometrics]
       exporters: [debug]
   telemetry:
     metrics:
