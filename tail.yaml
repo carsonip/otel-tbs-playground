@@ -6,6 +6,7 @@ receivers:
 
 processors:
   tail_sampling:
+    offload_to_disk: false
     num_traces: 10000
     decision_wait: 2s
     policies:

@@ -10,6 +10,7 @@ receivers:
 
 processors:
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/tailsamplingprocessor v0.130.0
+    path: ../opentelemetry-collector-contrib/processor/tailsamplingprocessor
 
 exporters:
   - gomod: github.com/carsonip/otel-tbs-playground/exporter/countexporter v0.0.0
