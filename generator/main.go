@@ -7,6 +7,7 @@ import (
 	"math/rand"
 	"os"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"go.opentelemetry.io/otel/attribute"
@@ -49,16 +50,21 @@ func runTransactions(tracerProvider *trace.TracerProvider) {
 	ctx := context.Background()
 	var wg sync.WaitGroup
 	var doneCh = make(chan struct{})
+	var slowTxnID, fastTxnID atomic.Int64
 
 	// Slow threads: each sends a slow transaction with configurable duration
 	for i := 0; i < *numSlow; i++ {
 		wg.Add(1)
 		go func(id int) {
 			defer wg.Done()
-			_, span := tracer.Start(ctx, fmt.Sprintf("slow-transaction-%d", id))
-			if *payloadSize > 0 {
-				span.SetAttributes(attribute.String("payload", randomString(*payloadSize)))
+			_, span := tracer.Start(ctx, fmt.Sprintf("slow-transaction-%d", slowTxnID.Add(1)))
+			attrs := []attribute.KeyValue{
+				attribute.String("thread_id", fmt.Sprintf("slow-%d", id)),
 			}
+			if *payloadSize > 0 {
+				attrs = append(attrs, attribute.String("payload", randomString(*payloadSize)))
+			}
+			span.SetAttributes(attrs...)
 			time.Sleep(*slowDuration)
 			span.End()
 			fmt.Printf("Slow transaction %d finished\n", id)
@@ -77,10 +83,14 @@ func runTransactions(tracerProvider *trace.TracerProvider) {
 					return
 				default:
 				}
-				_, span := tracer.Start(ctx, fmt.Sprintf("fast-transaction-%d", id))
-				if *payloadSize > 0 {
-					span.SetAttributes(attribute.String("payload", randomString(*payloadSize)))
+				_, span := tracer.Start(ctx, fmt.Sprintf("fast-transaction-%d", fastTxnID.Add(1)))
+				attrs := []attribute.KeyValue{
+					attribute.String("thread_id", fmt.Sprintf("fast-%d", id)),
 				}
+				if *payloadSize > 0 {
+					attrs = append(attrs, attribute.String("payload", randomString(*payloadSize)))
+				}
+				span.SetAttributes(attrs...)
 				span.End()
 				// Optionally, sleep for a tiny amount to avoid overwhelming the exporter
 				time.Sleep(10 * time.Millisecond)
@@ -90,6 +100,8 @@ func runTransactions(tracerProvider *trace.TracerProvider) {
 
 	// Wait for all slow transactions to finish, then exit
 	wg.Wait()
+
+	fmt.Printf("Sent %d spans\n", slowTxnID.Load()+fastTxnID.Load())
 }
 
 func main() {
