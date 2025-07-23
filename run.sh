@@ -26,7 +26,7 @@ exec 3< <(
 )
 
 # Run the Go generator
-(cd generator && OTEL_SERVICE_NAME=generator OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317 OTEL_EXPORTER_OTLP_INSECURE=true go run main.go -slow=1 -fast=5 -slow-duration=3s)
+(cd generator && OTEL_SERVICE_NAME=generator OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317 OTEL_EXPORTER_OTLP_INSECURE=true go run main.go -slow=1 -fast=10 -slow-duration=3s -payload-size=10000)
 
 sleep 10
 kill $TAIL_PID

@@ -6,7 +6,7 @@ receivers:
 
 processors:
   tail_sampling:
-    num_traces: 5
+    num_traces: 1000
     decision_wait: 1s
     policies:
       - name: always_sample
