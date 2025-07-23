@@ -32,7 +32,12 @@ func setup() *trace.TracerProvider {
 		fmt.Println("failed to initialize OTLP exporter:", err)
 		os.Exit(1)
 	}
-	tracerProvider := trace.NewTracerProvider(trace.WithSyncer(exporter))
+	tracerProvider := trace.NewTracerProvider(trace.WithBatcher(exporter, func(o *trace.BatchSpanProcessorOptions) {
+		o.BatchTimeout = 100 * time.Millisecond
+		o.MaxExportBatchSize = 10
+		o.BlockOnQueueFull = true
+		o.MaxQueueSize = 5000
+	}))
 	return tracerProvider
 }
 
