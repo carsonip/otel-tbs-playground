@@ -1,0 +1,33 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: "localhost:44317"
+
+connectors:
+  spanmetrics:
+    metrics_flush_interval: 5s
+    histogram:
+      disable: true
+
+exporters:
+  debug:
+    verbosity: normal
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: []
+      exporters: [spanmetrics]
+    metrics:
+      receivers: [spanmetrics]
+      exporters: [debug]
+  telemetry:
+    metrics:
+      readers:
+        - pull:
+            exporter:
+              prometheus:
+                host: localhost
+                port: 8889

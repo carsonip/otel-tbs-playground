@@ -2,6 +2,7 @@ receivers:
   otlp:
     protocols:
       grpc:
+        endpoint: "localhost:4317"
 
 processors:
   tail_sampling:
@@ -11,22 +12,24 @@ processors:
       - name: always_sample
         type: always_sample
 
-connectors:
-  spanmetrics:
-    metrics_flush_interval: 5s
-    histogram:
-      disable: true
-
 exporters:
-  debug:
-    verbosity: normal
+  otlp:
+    endpoint: "localhost:44317"
+    tls:
+      insecure: true
+
 
 service:
   pipelines:
     traces:
       receivers: [otlp]
       processors: [tail_sampling]
-      exporters: [spanmetrics]
+      exporters: [otlp]
+  telemetry:
     metrics:
-      receivers: [spanmetrics]
-      exporters: [debug]
+      readers:
+        - pull:
+            exporter:
+              prometheus:
+                host: localhost
+                port: 8888
