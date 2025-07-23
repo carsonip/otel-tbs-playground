@@ -1,7 +1,8 @@
 #!/bin/bash
 
-# Start the tail collector
-./_build/otel-tbs-playground --config tail.yaml &
+OFFLOAD_TO_DISK="$1"
+# Start the tail collector with offload_to_disk override
+./_build/otel-tbs-playground --config tail.yaml --set processors.tail_sampling.offload_to_disk="$OFFLOAD_TO_DISK" &
 TAIL_PID=$!
 
 # Give both collectors a moment to start
