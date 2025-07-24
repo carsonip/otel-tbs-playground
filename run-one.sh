@@ -27,7 +27,7 @@ exec 3< <(
 
 GENERATOR_PIDS=()
 for ((i=0; i<CONCURRENCY; i++)); do
-  (cd generator && OTEL_SERVICE_NAME=generator OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317 OTEL_EXPORTER_OTLP_INSECURE=true go run main.go -slow=1 -fast=100 -slow-duration=10s -payload-size="$PAYLOAD_SIZE") &
+  (cd generator && OTEL_SERVICE_NAME=generator OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317 OTEL_EXPORTER_OTLP_INSECURE=true go run main.go -slow=1 -fast=100 -slow-duration=10s -payload-size="$PAYLOAD_SIZE" -client-id="$i") &
   GENERATOR_PIDS+=("$!")
 done
 

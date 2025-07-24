@@ -24,6 +24,7 @@ var (
 	numSlow      = flag.Int("slow", 1, "number of slow threads")
 	slowDuration = flag.Duration("slow-duration", 10*time.Second, "duration of each slow transaction")
 	payloadSize  = flag.Int("payload-size", 0, "size of random payload attribute for each span")
+	clientID     = flag.String("client-id", "", "client id for this generator instance")
 )
 
 func setup() *trace.TracerProvider {
@@ -65,6 +66,7 @@ func runTransactions(tracerProvider *trace.TracerProvider) {
 			_, span := tracer.Start(ctx, fmt.Sprintf("slow-transaction-%d", slowTxnID.Add(1)))
 			attrs := []attribute.KeyValue{
 				attribute.String("thread_id", fmt.Sprintf("slow-%d", id)),
+				attribute.String("client_id", *clientID),
 			}
 			if *payloadSize > 0 {
 				attrs = append(attrs, attribute.String("payload", randomString(*payloadSize)))
@@ -72,7 +74,7 @@ func runTransactions(tracerProvider *trace.TracerProvider) {
 			span.SetAttributes(attrs...)
 			time.Sleep(*slowDuration)
 			span.End()
-			fmt.Printf("Slow transaction %d finished\n", id)
+			fmt.Printf("client id %s: Slow transaction %d finished\n", *clientID, id)
 			close(doneCh)
 		}(i)
 	}
@@ -91,6 +93,7 @@ func runTransactions(tracerProvider *trace.TracerProvider) {
 				_, span := tracer.Start(ctx, fmt.Sprintf("fast-transaction-%d", fastTxnID.Add(1)))
 				attrs := []attribute.KeyValue{
 					attribute.String("thread_id", fmt.Sprintf("fast-%d", id)),
+					attribute.String("client_id", *clientID),
 				}
 				if *payloadSize > 0 {
 					attrs = append(attrs, attribute.String("payload", randomString(*payloadSize)))
@@ -106,7 +109,7 @@ func runTransactions(tracerProvider *trace.TracerProvider) {
 	// Wait for all slow transactions to finish, then exit
 	wg.Wait()
 
-	fmt.Printf("Sent %d spans\n", slowTxnID.Load()+fastTxnID.Load())
+	fmt.Printf("client id %s: Sent %d spans\n", *clientID, slowTxnID.Load()+fastTxnID.Load())
 }
 
 func main() {
