@@ -34,3 +34,7 @@ The script `run-all.sh` is used to execute parameterized tests across different 
    ```
 5. Check output and logs for test results.
 
+## Results
+
+See [RESULTS.md](./RESULTS.md)
+
