@@ -16,8 +16,12 @@ processors:
 exporters:
   count:
 
+extensions:
+  pprof:
+    endpoint: "localhost:1777"
 
 service:
+  extensions: [pprof]
   pipelines:
     traces:
       receivers: [otlp]

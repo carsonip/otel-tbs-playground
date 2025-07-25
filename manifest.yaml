@@ -5,6 +5,9 @@ dist:
   version: 0.0.1
   output_path: ./_build
 
+extensions:
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/pprofextension v0.130.0
+
 receivers:
   - gomod: go.opentelemetry.io/collector/receiver/otlpreceiver v0.130.0
 
