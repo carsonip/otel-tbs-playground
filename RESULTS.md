@@ -24,7 +24,7 @@ All results below are collected with a 100% sampling rate.
 
 Disk offloading helps control memory usage at the cost of increased disk usage. For large payloads and high concurrency, enabling disk offloading can prevent excessive RSS growth, but may result in more disk I/O. Span drops can occur in both cases, but for different reasons (see below).
 
-Span drops with disk offloading enabled (`offload_to_disk=true`) are primarily due to the sampling decision lagging behind, causing spans to expire in the database before a decision is made. With disk offloading disabled (`offload_to_disk=false`), span drops are mainly caused by the `num_traces` limitation in memory.
+Span drops with disk offloading enabled (`offload_to_disk=true`) are primarily due to the sampling decision lagging behind, causing spans to expire in the database before a decision is made. This is fixable with better synchronization between sampling decision making and database entry expiry control. With disk offloading disabled (`offload_to_disk=false`), span drops are mainly caused by the `num_traces` limitation in memory.
 
 ### Raw run-all output
 
