@@ -1,7 +1,7 @@
 # otel-tbs-playground
 
 ## Overview
-This project demonstrates OpenTelemetry integration with a tail-based sampling collector. It includes a generator component that sends telemetry data to the tail collector, and scripts for running parameterized tests. The main goal is to compare the performance of the collector with disk offloading disabled and enabled, using the `offload_to_disk` option from a fork of the tail sampling processor.
+This project demonstrates OpenTelemetry integration with a tail-based sampling collector. It includes a generator component that sends telemetry data to the tail collector, and scripts for running parameterized tests. The main goal is to compare the performance of the collector with disk offloading disabled and enabled, using the `offload_to_disk` option from a [fork of the tail sampling processor](https://github.com/open-telemetry/opentelemetry-collector-contrib/compare/main...carsonip:opentelemetry-collector-contrib:tailsampling-pebble).
 
 ## Generator and Tail Collector
 The generator (located in `generator/main.go`) produces telemetry data (traces, metrics, etc.) and sends it to the tail collector. The tail collector refers to a collector instance with the tail sampling processor enabled, as configured in `tail.yaml`.
