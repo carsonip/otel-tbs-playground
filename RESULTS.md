@@ -17,7 +17,7 @@ All results below are collected with a 100% sampling rate.
 
 ### Performance Comparison
 
-| Disk Offloading | Payload Size | Concurrency | Max RSS (KB) | DB Size (KB) | Spans Sent | Spans Received |
+| Disk Offloading | Payload Size (B) | Concurrency | Max RSS (KB) | DB Size (KB) | Spans Sent | Spans Received |
 |-----------------|-------------|-------------|--------------|--------------|------------|---------------|
 | true          | 100000      | 10          | 275192       | 901261       | 29952      | 29791         |
 | false         | 100000      | 10          | 2195184      | N/A          | 29401      | 11434         |
