@@ -17,10 +17,10 @@ All results below are collected with a 100% sampling rate.
 
 ### Performance Comparison
 
-|- | Disk Offloading | Payload Size | Concurrency | Max RSS (KB) | DB Size (KB) | Spans Sent | Spans Received |
-|---|-----------------|-------------|-------------|--------------|--------------|------------|---------------|
-| Example | true          | 100000      | 10          | 275192       | 901261       | 29952      | 29791         |
-| Example | false         | 100000      | 10          | 2195184      | N/A          | 29401      | 11434         |
+| Disk Offloading | Payload Size | Concurrency | Max RSS (KB) | DB Size (KB) | Spans Sent | Spans Received |
+|-----------------|-------------|-------------|--------------|--------------|------------|---------------|
+| true          | 100000      | 10          | 275192       | 901261       | 29952      | 29791         |
+| false         | 100000      | 10          | 2195184      | N/A          | 29401      | 11434         |
 
 Disk offloading helps control memory usage at the cost of increased disk usage. For large payloads and high concurrency, enabling disk offloading can prevent excessive RSS growth, but may result in more disk I/O. Span drops can occur in both cases, but for different reasons (see below).
 
